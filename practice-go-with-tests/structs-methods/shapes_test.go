@@ -29,10 +29,10 @@ func TestArea(t *testing.T) {
 		checkArea(t, rectangle, expected)
 	})
 
-	t.Run("circles"), func(t *testing.T)  {
+	t.Run("circles", func(t *testing.T) {
 		circle := Circle{10}
 		expected := 314.1592653589793
-		checkArea(t, t, expected)	
+		checkArea(t, circle, expected)
 	})
 }
 
