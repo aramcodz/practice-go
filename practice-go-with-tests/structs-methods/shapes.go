@@ -1,14 +1,28 @@
 package main
 
-type Rectange struct {
+import "math"
+
+type Shape interface {
+	Area() float64
+}
+
+type Rectangle struct {
 	Width  float64
 	Height float64
 }
 
-func Perimeter(rect Rectange) float64 {
-	return (rect.Width + rect.Height) * 2
+type Circle struct {
+	Radius float64
 }
 
-func Area(rect Rectange) float64 {
-	return rect.Height * rect.Width
+func (r Rectangle) Area() float64 {
+	return r.Height * r.Width
+}
+
+func (r Rectangle) Perimiter() float64 {
+	return (r.Width + r.Height) * 2
+}
+
+func (c Circle) Area() float64 {
+	return math.Pi * c.Radius * c.Radius
 }
