@@ -10,28 +10,35 @@ Reference Dave Cheney Blog Post:
 
 If two goroutines try to write to the same map at the same time, the program will crash with a fatal error:
 
-TODO: create a SafeMap implemenetation.
-Implement a thread-safe Cache struct that allows multiple goroutines to safely read and write data concurrently without crashing.
+TODO:
+Let's build a CatProfile Cache
 
+CatProfile(s) consist of a Cat ID, Name and Age.
 */
 
 import (
 	"sync"
 )
 
+type CatProfile struct {
+	Id   int
+	Name string
+	Age  int
+}
+
 type SafeIntMap struct {
 	mu sync.Mutex
-	m  map[string]int
+	m  map[string]CatProfile
 }
 
 //	Incremental Step for implemenation
 //
 // NOT safe for Concurrent Write Access
-func (s *SafeIntMap) Set(key string, value int) {
+func (s *SafeIntMap) Set(key string, value CatProfile) {
 	s.m[key] = value
 }
 
 // NOT safe for Concurrent Read Access
-func (s *SafeIntMap) Get(key string) (int, bool) {
+func (s *SafeIntMap) Get(key string) (CatProfile, bool) {
 	return s.m[key], true
 }
