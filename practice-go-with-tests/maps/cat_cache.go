@@ -21,12 +21,13 @@ import (
 )
 
 type CatProfile struct {
-	Id   int
-	Name string
-	Age  int
+	Id      int
+	Name    string
+	Age     int
+	Pattern string
 }
 
-type SafeIntMap struct {
+type SafeCatProfileMap struct {
 	mu sync.Mutex
 	m  map[string]CatProfile
 }
@@ -34,11 +35,11 @@ type SafeIntMap struct {
 //	Incremental Step for implemenation
 //
 // NOT safe for Concurrent Write Access
-func (s *SafeIntMap) Set(key string, value CatProfile) {
+func (s *SafeCatProfileMap) Set(key string, value CatProfile) {
 	s.m[key] = value
 }
 
 // NOT safe for Concurrent Read Access
-func (s *SafeIntMap) Get(key string) (CatProfile, bool) {
+func (s *SafeCatProfileMap) Get(key string) (CatProfile, bool) {
 	return s.m[key], true
 }
