@@ -10,6 +10,10 @@ Reference Dave Cheney Blog Post:
 
 If two goroutines try to write to the same map at the same time, the program will crash with a fatal error:
 
+Concurrent Maps Issue References ->
+  1. https://go.dev/blog/maps#concurrency
+  2. https://go.dev/doc/faq#atomic_maps
+
 TODO:
 Let's build a CatProfile Cache
 
@@ -42,4 +46,8 @@ func (s *SafeCatProfileMap) Set(key string, value CatProfile) {
 // NOT safe for Concurrent Read Access
 func (s *SafeCatProfileMap) Get(key string) (CatProfile, bool) {
 	return s.m[key], true
+}
+
+func (s *SafeCatProfileMap) Count() int {
+	return len(s.m)
 }

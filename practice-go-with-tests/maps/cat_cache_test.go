@@ -5,11 +5,13 @@ The Question: Build a Concurrent CacheProblem Statement:
 
 In Go, standard maps do not support concurrent writes.
 If two goroutines try to write to the same map at the same time, the program will crash with a fatal error:
+
 */
 
 import (
 	"math/rand/v2"
 	"strconv"
+	"sync"
 	"testing"
 )
 
@@ -52,15 +54,30 @@ func TestSafeMapInt(t *testing.T) {
 
 func TestSafeMapConcurrent(t *testing.T) {
 
-	//TODO:
+	catProfiles := SafeCatProfileMap{
+		m: make(map[string]CatProfile),
+	}
 
-	// sm := catProfileMap{
-	// 	m: make(map[string]int),
-	// }
-	// var wg sync.WaitGroup
-	// workers := 500
+	workers := 500
+	iterations := 500
+	var wg sync.WaitGroup
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			for j := 0; j < iterations; j++ {
+				// create the test data --> CatProfiles map, and adds to the "SafeMap"
+				key := strconv.Itoa(i)
+				cp := createRandomCatProfile(i)
+				catProfiles.Set(key, cp)
+			}
 
-	// Concurrent Reads and Writes - launch # of workers goroutines
+		}(i)
+	}
+	println("map count: " + strconv.Itoa(catProfiles.Count()))
+
+	// Concurrent Reads and Writes - launch # of workers goroutines)
+
 	// for i := 0; i < workers; i++ {
 	// 	wg.Add(1)
 	// 	go func(workerId int) {
