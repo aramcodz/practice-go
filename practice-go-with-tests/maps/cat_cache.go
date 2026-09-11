@@ -36,16 +36,18 @@ type SafeCatProfileMap struct {
 	m  map[string]CatProfile
 }
 
-//	Incremental Step for implemenation
-//
-// NOT safe for Concurrent Write Access
 func (s *SafeCatProfileMap) Set(key string, value CatProfile) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.m[key] = value
 }
 
-// NOT safe for Concurrent Read Access
 func (s *SafeCatProfileMap) Get(key string) (CatProfile, bool) {
-	return s.m[key], true
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	val, exists := s.m[key]
+	return val, exists
+
 }
 
 func (s *SafeCatProfileMap) Count() int {

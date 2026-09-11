@@ -11,8 +11,10 @@ If two goroutines try to write to the same map at the same time, the program wil
 import (
 	"math/rand/v2"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestSafeMapInt(t *testing.T) {
@@ -61,6 +63,7 @@ func TestSafeMapConcurrent(t *testing.T) {
 	workers := 500
 	iterations := 500
 	var wg sync.WaitGroup
+	// 1. Concurrent Writes - launch # of workers goroutines
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
 		go func(workerID int) {
@@ -74,30 +77,50 @@ func TestSafeMapConcurrent(t *testing.T) {
 
 		}(i)
 	}
+
+	time.Sleep(time.Second)
 	println("map count: " + strconv.Itoa(catProfiles.Count()))
 
-	// Concurrent Reads and Writes - launch # of workers goroutines)
+	// 2. Concurrent Reads
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			key := strconv.Itoa(i)
+			actualProfile, ok := catProfiles.Get(key)
+			if !ok {
+				t.Errorf("Could Not Get profile ID %v", i)
+			}
+			//Val should Exist - Name must start with "furry-"
+			if !strings.HasPrefix(actualProfile.Name, "furry-") {
+				t.Errorf("The actual Profile Name %v does Not match the expected %v", actualProfile.Name, "furry-")
+			}
+			if actualProfile.Id != i {
+				t.Errorf("The actual Profile ID %v does Not match the expected %v", actualProfile.Id, i)
+			}
 
-	// for i := 0; i < workers; i++ {
-	// 	wg.Add(1)
-	// 	go func(workerId int) {
-	// 		sm.Set()
-	// 	}
+			//fmt.Printf("Cat with ID %v is Named: %s \n", i, actualProfile.Name)
+		}(1)
+	}
 
-	// }
+	wg.Wait()
 
 }
 
 func createRandomCatProfile(id int) CatProfile {
-	name := "furry-" + strconv.Itoa(id)
-	ages := []int{1, 3, 5, 8, 15}
+	nameSuffixes := []string{"Luna", "Mittens", "Willa", "Jasper", "Floof", "Benny", "Benjamin", "Thomas", "KittenCorn", "Princess-P", "Willa-Pilla", "Buna-Cat"}
 	// rand.N generates a random number from 0 to len(items)-1
-	randIndex1 := rand.N(len(ages))
-	age := ages[randIndex1]
+	randIdx1 := rand.N(len(nameSuffixes))
 
-	coatPatterns := []string{"solid", "bicolor", "tabby", "calico", "tortoiseshell"}
-	randIndex2 := rand.N(len(coatPatterns))
-	pattern := coatPatterns[randIndex2]
+	name := "furry-" + nameSuffixes[randIdx1]
+	ages := []int{1, 3, 5, 8, 15}
+
+	randIdx2 := rand.N(len(ages))
+	age := ages[randIdx2]
+
+	coatPatterns := []string{"solid", "bicolor", "tabby", "calico", "tortoise", "sealpoint", "tuxedo"}
+	randIdx3 := rand.N(len(coatPatterns))
+	pattern := coatPatterns[randIdx3]
 
 	return CatProfile{
 		Id:      id,
@@ -105,5 +128,4 @@ func createRandomCatProfile(id int) CatProfile {
 		Age:     age,
 		Pattern: pattern,
 	}
-
 }
